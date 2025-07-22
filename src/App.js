@@ -2,58 +2,33 @@ const express = require("express");
 
 const app = express();
 
-// app.get("/user",(req,res)=>{
-//     console.log(req.query)
-//     console.log(req.params)
-//     res.send({Name:"nethaji", age:27})
-// })
+const connectDB = require("./config/database");
 
-// app.post("/user",(req,res)=>{
-//     res.send("Data posted successfully")
-// })
+const User = require('./models/user');
 
-// app.delete("/user",(req,res)=>{
-//     res.send("Deleted Successfully")
-// })
-
-// app.use("/",(req,res, next)=>{
-// //    res.send("route1");
-//    next()
-// })
-
-// app.get("/user",(req,res,next)=>{
-//     console.log("hiii");
-//     // res.send("Iam back");
-//     next()
-// },(req,res)=>{
-//     console.log("2nd");
-//     res.send("2nd back")
-// })
-
-// const {adminAuth}= require("./middlewares/auth")
-
-// app.use('/admin',adminAuth);
-
-app.get("/admin/getUser",(req,res)=>{
+app.post("/signUp", async(req, res)=>{
+    const user = new User({
+        firstName : "Nethaji",
+        lastName : "Goud",
+        age : 27,
+        gender : "male",
+        email : "vng@gmail.com"
+    })
     try{
-    throw new Error("Something went wrong")
-    res.send("Hi iam user")
+        await user.save();
+        res.send("User Added Successfully")
     }catch(err){
-        res.status(500).send(err.message)
+       res.status(400).send(err)
     }
 })
 
-app.use("/",(err,req,res,next)=>{
-    // console.log("Iam in /")
-    if(err){
-      res.status(400).send("iam in /")
-    }
-    // console.log("iam in /")
-    // res.send("Iam in /")
-})
-
-
-
-app.listen("7777",()=>{
-    console.log("listening")
-})
+connectDB()
+  .then(() => {
+    console.log("Connection Established");
+    app.listen("7777", () => {
+      console.log("listening");
+    });
+  })
+  .catch((err) => {
+    console.log("Connection not established");
+  });
