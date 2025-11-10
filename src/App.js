@@ -42,18 +42,18 @@ app.delete("/user", async(req, res)=>{
 app.patch("/user", async(req, res)=>{
   const email = req.body.email;
   const obj = req.body
-  // try{
-  //   const updateUser = await User.findByIdAndUpdate(id, obj, {returnDocument:"after"});
-  //   res.send(updateUser)
-  // }catch(err){
-  //   res.status(400).send(err)
-  // }
   try{
-    const updateUser = await User.findOneAndUpdate({email: email}, obj, {returnDocument:"after"});
+    const updateUser = await User.findByIdAndUpdate(id, obj, {returnDocument:"after"});
     res.send(updateUser)
   }catch(err){
     res.status(400).send(err)
   }
+  // try{
+  //   const updateUser = await User.findOneAndUpdate({email: email}, obj, {returnDocument:"after"});
+  //   res.send(updateUser)
+  // }catch(err){
+  //   res.status(400).send(err)
+  // }
 })
 connectDB()
   .then(() => {
