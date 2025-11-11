@@ -6,7 +6,13 @@ const connectDB = require("./config/database");
 
 const User = require('./models/user');
 
-app.use(express.json())
+app.use(express.json());
+
+
+(async () => {
+  await User.syncIndexes();
+  console.log("Indexes synced!");
+})();
 
 app.post("/signUp", async(req, res)=>{
     const user = new User(req.body)
@@ -21,7 +27,7 @@ app.post("/signUp", async(req, res)=>{
 app.get("/user", async(req,res)=>{
   const email = req.body.email;
   try{
-    const user = await User.find({email : email});
+    const user = await User.find({});
     res.send(user)
   }catch(err){
     res.status(400).send(err)
@@ -39,14 +45,19 @@ app.delete("/user", async(req, res)=>{
 })
 
 
-app.patch("/user", async(req, res)=>{
-  const email = req.body.email;
+app.patch("/user/:userId", async(req, res)=>{
+  const params = req.params?.userId
   const obj = req.body
   try{
-    const updateUser = await User.findByIdAndUpdate(id, obj, {returnDocument:"after"});
+    const validFields=["skills","about","age"]
+    const isValid= Object.keys(obj).every((val)=>validFields.includes(val));
+    if(!isValid){
+     throw new Error("Update not allowed")
+    }
+    const updateUser = await User.findByIdAndUpdate(params, obj, {returnDocument:"after"});
     res.send(updateUser)
   }catch(err){
-    res.status(400).send(err)
+    res.status(400).send(err.message)
   }
   // try{
   //   const updateUser = await User.findOneAndUpdate({email: email}, obj, {returnDocument:"after"});
