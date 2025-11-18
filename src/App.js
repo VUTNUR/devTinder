@@ -6,21 +6,28 @@ const connectDB = require("./config/database");
 
 const User = require('./models/user');
 
+const {validate} = require("./utils/validate")
+
+const bcrypt = require("bcrypt")
+
 app.use(express.json());
 
 
-(async () => {
-  await User.syncIndexes();
-  console.log("Indexes synced!");
-})();
-
 app.post("/signUp", async(req, res)=>{
-    const user = new User(req.body)
     try{
+        validate(req);
+        const {firstName, lastName, password, email} = req.body;
+        const hashPassword =await bcrypt.hash(password, 10)
+        const user = new User({
+          firstName,
+          lastName,
+          password:hashPassword,
+          email
+        })
         await user.save();
         res.send("User Added Successfully")
     }catch(err){
-       res.status(400).send(err)
+       res.status(400).send("Error : "+err.message)
     }
 })
 
