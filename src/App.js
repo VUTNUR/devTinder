@@ -6,7 +6,9 @@ const connectDB = require("./config/database");
 
 const User = require('./models/user');
 
-const {validate} = require("./utils/validate")
+const {validate} = require("./utils/validate");
+
+const validator = require("validator")
 
 const bcrypt = require("bcrypt")
 
@@ -30,7 +32,27 @@ app.post("/signUp", async(req, res)=>{
        res.status(400).send("Error : "+err.message)
     }
 })
-
+app.post("/login", async(req, res)=>{
+    try{
+        const {email, password} = req.body;
+        if(!validator.isEmail(email)){
+          throw new Error("Invalid Credentials")
+        }
+        const user = await User.findOne({email})
+        if(user){
+          const isPasswordCorrect= await bcrypt.compare(password, user?.password);
+          if(isPasswordCorrect){
+            res.send("Logged In Successfully")
+          }else{
+            throw new Error("Invalid Credentials")
+          }     
+        }else{
+          throw new Error("Invalid Credentials")
+        }
+    }catch(err){
+       res.status(400).send("Error : "+err.message)
+    }
+})
 app.get("/user", async(req,res)=>{
   const email = req.body.email;
   try{
