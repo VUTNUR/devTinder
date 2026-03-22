@@ -3,7 +3,6 @@ const User = require("../models/user");
 const adminAuth = async (req,res,next)=>{
     try{
       const token = req.cookies?.token;
-      console.log("token",token)
       if(!token){
         throw new Error("Need Token!")
       }

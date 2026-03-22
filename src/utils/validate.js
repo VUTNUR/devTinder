@@ -13,4 +13,16 @@ const validate=(req)=>{
   }
 }
 
-module.exports={validate}
+const validateEdit = (req)=>{
+   const includeFields = ["firstName","lastName","age","gender","email","skills"];
+   const isValid = Object.keys(req).every((val)=>includeFields.includes(val));
+   return isValid
+}
+
+const validatePassword = (req)=>{
+   const includeFields = ["oldPassword","newPassword"];
+   const isValid = Object.keys(req).every((val)=>includeFields.includes(val));
+   return isValid
+}
+
+module.exports={validate, validateEdit, validatePassword}

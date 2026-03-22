@@ -30,10 +30,12 @@ router.post("/login", async(req, res)=>{
         }
         const user = await User.findOne({email})
         if(user){
-          const isPasswordCorrect= user.bcrypt(password)
+          const isPasswordCorrect= await user.bcrypt(password);
           if(isPasswordCorrect){
             const token = user.getJwtToken()
-            res.cookie('token', token);
+            res.cookie('token', token, {
+                expires: new Date(Date.now() + 8 * 3600000) // cookie will be removed after 8 hours
+            });
             res.send("Logged In Successfully");
           }else{
             throw new Error("Invalid Credentials")
@@ -44,6 +46,13 @@ router.post("/login", async(req, res)=>{
     }catch(err){
        res.status(400).send("Error : "+err.message)
     }
+})
+
+router.post("/logout", async(req, res)=>{
+    res.cookie("token",null, {
+        expires: new Date(Date.now())
+    })
+    res.send("Logout successfully!!")
 })
 
 module.exports = router

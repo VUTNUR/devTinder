@@ -1,0 +1,5 @@
+// authRouter
+
+-> /signup
+-> /login
+-> /logout
