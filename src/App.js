@@ -1,100 +1,20 @@
 const express = require("express");
-
+const cookieParser = require("cookie-parser");
 const app = express();
-
 const connectDB = require("./config/database");
-
-const User = require('./models/user');
-
-const {validate} = require("./utils/validate");
-
-const validator = require("validator")
-
-const bcrypt = require("bcrypt")
-
 app.use(express.json());
+app.use(cookieParser());
+
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
+
+app.use("/",authRouter);
+app.use("/",profileRouter);
+app.use("/",requestRouter);
 
 
-app.post("/signUp", async(req, res)=>{
-    try{
-        validate(req);
-        const {firstName, lastName, password, email} = req.body;
-        const hashPassword =await bcrypt.hash(password, 10)
-        const user = new User({
-          firstName,
-          lastName,
-          password:hashPassword,
-          email
-        })
-        await user.save();
-        res.send("User Added Successfully")
-    }catch(err){
-       res.status(400).send("Error : "+err.message)
-    }
-})
-app.post("/login", async(req, res)=>{
-    try{
-        const {email, password} = req.body;
-        if(!validator.isEmail(email)){
-          throw new Error("Invalid Credentials")
-        }
-        const user = await User.findOne({email})
-        if(user){
-          const isPasswordCorrect= await bcrypt.compare(password, user?.password);
-          if(isPasswordCorrect){
-            res.send("Logged In Successfully")
-          }else{
-            throw new Error("Invalid Credentials")
-          }     
-        }else{
-          throw new Error("Invalid Credentials")
-        }
-    }catch(err){
-       res.status(400).send("Error : "+err.message)
-    }
-})
-app.get("/user", async(req,res)=>{
-  const email = req.body.email;
-  try{
-    const user = await User.find({});
-    res.send(user)
-  }catch(err){
-    res.status(400).send(err)
-  }
-})
 
-app.delete("/user", async(req, res)=>{
-  const id = req.body.id;
-  try{
-    const deleteUser = await User.findByIdAndDelete(id);
-    res.send(deleteUser)
-  }catch(err){
-    res.status(400).send(err)
-  }
-})
-
-
-app.patch("/user/:userId", async(req, res)=>{
-  const params = req.params?.userId
-  const obj = req.body
-  try{
-    const validFields=["skills","about","age"]
-    const isValid= Object.keys(obj).every((val)=>validFields.includes(val));
-    if(!isValid){
-     throw new Error("Update not allowed")
-    }
-    const updateUser = await User.findByIdAndUpdate(params, obj, {returnDocument:"after"});
-    res.send(updateUser)
-  }catch(err){
-    res.status(400).send(err.message)
-  }
-  // try{
-  //   const updateUser = await User.findOneAndUpdate({email: email}, obj, {returnDocument:"after"});
-  //   res.send(updateUser)
-  // }catch(err){
-  //   res.status(400).send(err)
-  // }
-})
 connectDB()
   .then(() => {
     console.log("Connection Established");
