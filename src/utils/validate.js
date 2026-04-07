@@ -25,4 +25,10 @@ const validatePassword = (req)=>{
    return isValid
 }
 
-module.exports={validate, validateEdit, validatePassword}
+const validateStatus = (status) => {
+  const allowedStatus = ["interested", "notInterested"];
+  return allowedStatus.includes(status);
+};
+
+
+module.exports={validate, validateEdit, validatePassword, validateStatus}
