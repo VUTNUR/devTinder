@@ -5,7 +5,7 @@ const { validateStatus } = require("../utils/validate");
 const User = require("../models/user");
 const Connection = require("../models/connectionRequest")
 
-router.post("/sendConnection/:status/:toConnectionId", adminAuth, async(req,res)=>{
+router.post("/request/send/:status/:toConnectionId", adminAuth, async(req,res)=>{
    try{
       const {user} = req;
       const status = req.params.status;
@@ -42,6 +42,30 @@ router.post("/sendConnection/:status/:toConnectionId", adminAuth, async(req,res)
       res.send("Connection sent successfully")
    }catch(err){
      res.status(400).send(err.message)
+   }
+})
+
+router.post("/request/review/:status/:requestId",adminAuth,async(req,res)=>{
+   try{
+      const loggedInUser = req.user;
+      const {status, requestId} = req.params;
+      const allowedStatus = ["accepted","rejected"];
+      if(!allowedStatus.includes(status)){
+         throw new Error("Invalid status")
+      }
+      const connectionRequest = await Connection.findOne({
+         _id:requestId,
+         toConnectionId:loggedInUser._id,
+         status:"interested"
+      })
+      if(!connectionRequest){
+         throw new Error("Connect request not found")
+      }
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+      res.json({message:"Connection request "+status, data})
+   }catch(err){
+      res.status(400).send(err.message)
    }
 })
 

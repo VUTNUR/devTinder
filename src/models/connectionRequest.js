@@ -4,13 +4,17 @@ const mangoose = require("mongoose");
 const connectionRequestSchema = new mangoose.Schema(
 {
     fromConnectionId : {
-        type : mangoose.SchemaTypes.ObjectId
+        type : mangoose.SchemaTypes.ObjectId,
+        required: true,
     },
     toConnectionId : {
-        type : mangoose.SchemaTypes.ObjectId
+        type : mangoose.SchemaTypes.ObjectId,
+        required: true,
     },
     status :{
-        type : [String]
+        type : String,
+        required: true,
+        enum: ["interested", "notInterested", "accepted", "rejected"],
     }
 },
 {
