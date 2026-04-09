@@ -6,10 +6,12 @@ const connectionRequestSchema = new mangoose.Schema(
     fromConnectionId : {
         type : mangoose.SchemaTypes.ObjectId,
         required: true,
+        ref:"User"
     },
     toConnectionId : {
         type : mangoose.SchemaTypes.ObjectId,
         required: true,
+        ref :"User"
     },
     status :{
         type : String,
