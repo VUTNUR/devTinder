@@ -42,6 +42,9 @@ router.get("/user/connections", adminAuth, async(req,res)=>{
 
 router.get("/user/feed",adminAuth, async(req,res)=>{
     try{
+       const page = req.query.page || 1;
+       const limit = req.query.limit || 10;
+       const offset=(page - 1) * limit;
        const loggedInUser = req.user;
        const connections = await Connections.find({
          $or:[
@@ -67,7 +70,7 @@ router.get("/user/feed",adminAuth, async(req,res)=>{
                 }
             }
         ]
-       }).select(SAFE_DATA)
+       }).select(SAFE_DATA).skip(offset).limit(limit)
        res.json({data:showUsers})
     }catch(err){
        res.status(400).send("Error: "+err.message)
