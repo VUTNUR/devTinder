@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const adminAuth = require("../middlewares/auth");
 const Connections = require("../models/connectionRequest");
+const Users = require("../models/user")
 
 const SAFE_DATA = "firstName lastName skills about"
 
@@ -34,6 +35,40 @@ router.get("/user/connections", adminAuth, async(req,res)=>{
         return el.fromConnectionId
        })
        res.json({data:sendData})
+    }catch(err){
+       res.status(400).send("Error: "+err.message)
+    }
+})
+
+router.get("/user/feed",adminAuth, async(req,res)=>{
+    try{
+       const loggedInUser = req.user;
+       const connections = await Connections.find({
+         $or:[
+            {toConnectionId:loggedInUser._id},
+            {fromConnectionId:loggedInUser._id}
+         ]
+       })
+       const hideUsers = new Set();
+       connections.forEach((row)=>{
+        hideUsers.add(row.toConnectionId.toString());
+        hideUsers.add(row.fromConnectionId.toString())
+       })
+       const showUsers = await Users.find({
+        $and:[
+            {
+                _id:{
+                        $nin : Array.from(hideUsers)
+                    }
+            },
+            {
+                _id:{
+                    $ne : loggedInUser._id
+                }
+            }
+        ]
+       }).select(SAFE_DATA)
+       res.json({data:showUsers})
     }catch(err){
        res.status(400).send("Error: "+err.message)
     }
