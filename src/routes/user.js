@@ -6,7 +6,7 @@ const Users = require("../models/user")
 
 const SAFE_DATA = "firstName lastName skills about"
 
-router.get("/user/request/received",adminAuth, async(req, res)=>{
+router.get("/user/requests/received",adminAuth, async(req, res)=>{
     try{
         const loggedInUser = req.user;
         const recievedData = await Connections.find({

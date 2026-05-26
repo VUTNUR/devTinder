@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
          }
         }
     },
+    photoUrl : {
+        type: String
+    },
     email :{
         type : String,
         required: true,
