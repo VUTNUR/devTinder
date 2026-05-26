@@ -4,7 +4,7 @@ const adminAuth = async (req,res,next)=>{
     try{
       const token = req.cookies?.token;
       if(!token){
-        throw new Error("Need Token!")
+        res.status(401).send("Please Login")
       }
       const decoded = jwt.verify(token, 'SDFJBKJSDBAKJSDASAS');
       const {_id} = decoded;
