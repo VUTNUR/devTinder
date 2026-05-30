@@ -16,6 +16,21 @@ const validate=(req)=>{
 const validateEdit = (req)=>{
    const includeFields = ["firstName","lastName","age","gender","email","skills","photoUrl","about"];
    const isValid = Object.keys(req).every((val)=>includeFields.includes(val));
+   if(!isValid){
+      return false
+   }
+
+   if(Object.prototype.hasOwnProperty.call(req, "gender")){
+      const allowedGenders = ["male","female","others"];
+      if(req.gender === ""){
+         return isValid
+      }
+
+      if(typeof req.gender !== "string" || !allowedGenders.includes(req.gender.trim())){
+         throw new Error("Gender must be one of male, female or others")
+      }
+   }
+
    return isValid
 }
 

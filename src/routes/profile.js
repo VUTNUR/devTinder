@@ -15,8 +15,13 @@ router.patch("/profile/edit", adminAuth, async(req,res)=>{
        }
        const user = req.user;
        const responseBody = req.body;
-       Object.keys(responseBody)?.forEach((key)=>user[key] = responseBody[key]);
-       user.save();
+       Object.keys(responseBody)?.forEach((key)=>{
+        if(key === "gender" && responseBody[key] === ""){
+            return;
+        }
+        user[key] = responseBody[key]
+       });
+       await user.save();
        res.json({
         message : `${user?.firstName}, Your profile updated successfuly`,
         data: user
@@ -33,12 +38,12 @@ router.patch("/profile/passwordEdit", adminAuth, async(req,res)=>{
        }
        const {oldPassword, newPassword} = req.body;
        const user = req.user;
-       if(!user?.bcrypt(oldPassword)){
+       if(!await user.bcrypt(oldPassword)){
         throw new Error("Pls give correct password")
        }
        const hashPassword = await bcrypt.hash(newPassword,10);
        user.password = hashPassword;
-       user.save();
+       await user.save();
        res.json({
         message : "Password updated successfully",
         body:user

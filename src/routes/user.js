@@ -4,7 +4,7 @@ const adminAuth = require("../middlewares/auth");
 const Connections = require("../models/connectionRequest");
 const Users = require("../models/user")
 
-const SAFE_DATA = "firstName lastName skills about"
+const SAFE_DATA = "firstName lastName skills about photoUrl"
 
 router.get("/user/requests/received",adminAuth, async(req, res)=>{
     try{
